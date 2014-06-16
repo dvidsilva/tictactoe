@@ -32,7 +32,6 @@ function compare3(a, b, c) {
 }
 /** validate lines verticaly, horizontaly and diagonaly */
 function boardWonBySomeone(g) {
-
     for (var i = 0; i < comparisons.length; i++) {
         var r = compare3(comparisons[i][0], comparisons[i][1], comparisons[i][2]);
         if (r !== false) {
@@ -53,7 +52,7 @@ function getPlayerPosition(g, p) {
             if (i % 2 === 0) {
                 return "x";
             } else {
-                return "o";
+                return "+";
             }
         }
     }
@@ -87,6 +86,29 @@ function playValidMove(g) {
     play(a, false);
     return g;
 }
+
+function playSmartMove(){
+    var choice, filter, victories = [], shortest;
+    filter = new RegExp("^" + g);
+    for(var i in games){
+    	if(games[i].match(filter)){
+            if(games[i].length % 2 == 0 ){
+                victories.push(games[i]);
+            }
+        }
+    }
+    /* if the game was recorded play a choice, if not, play a random one */
+    if(victories.length > 0){
+        shortest = games.reduce(function (a, b) { return a.length < b.length ? a : b; });
+        choice = shortest[ g.length ];
+        play(choice, false);
+    }else{
+    	playValidMove(g);
+    }
+    return(g);
+}
+
+
 /* count a dict */
 function count_items(x) {
     var c = 0;
@@ -123,7 +145,7 @@ function generateGame() {
     g = "";
     while (boardWonBySomeone(g) === false) {
         old_board = g;
-        g = playValidMove(g);
+        g = playSmartMove(g);
         if (g == old_board) {
             //there were no more valid moves left
             //it was a tie
@@ -138,7 +160,7 @@ function generateGame() {
  * train the computer
  * */
 function generateGames(total) {
-    total = total || 1000;
+    var total = total || 1000;
     for (var i = 0; i < total; i++) {
         generateGame();
     }
@@ -149,13 +171,21 @@ function clear() {
     g = "";
     $("." + player1Icon).removeClass(player1Icon);
     $("." + player2Icon).removeClass(player2Icon);
+    changeSign('');
     return true;
+}
+
+function changeSign(whatyousay){
+	$('#sign').html(whatyousay);
 }
 
 function play(position, auto) {
     var currentPlayer;
-    if((g.match(position) !== null || g.length === 9 ) && gameOver !== true ){
+    if( (g.match(position) !== null || g.length === 9 ) ){
         /* atempted to play in a position that has a move on it */
+    	return false;
+    }
+    if (gameOver === true){
     	return false;
     }
     currentPlayer = g.length % 2 == 0 ? player1Icon : player2Icon;
@@ -164,23 +194,27 @@ function play(position, auto) {
     result = boardWonBySomeone(g);
     if ( result !== false ){
         games[games.length] = g;
-        console.log(g);
-    	console.log(result + " won the game");
+        changeSign(result + " won the game");
         gameOver = true;
         return true;
     }
     if(currentPlayer===player1Icon && auto !== false){
-        playValidMove(g);
+        //playValidMove(g);
+        // Function that analyses the previous game and makes a smart choice
+        playSmartMove(g);
     }
     if(g.length === 9){
         gameOver = true;
-		console.log("tie");
+		changeSign("tie");
         return true;
     }
     return true;
 }
 
+function train(){
+    clear();
+    generateGames(1000);
+}
 function init() {
     clear();
-    //generateGames(1); // automatic training
 }
