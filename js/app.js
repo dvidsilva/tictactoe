@@ -4,8 +4,10 @@
     all possible winning positions. */
 var g = "",  
     gameOver = false,
+    obviousMoves = [],
     games = [],
     comparisons = [],
+    computerPlayer = true,
     player1Icon = "glyphicon-remove-sign",
     player2Icon = "glyphicon-plus-sign";
 
@@ -21,6 +23,11 @@ comparisons.push(["1", "5", "9"]);
 comparisons.push(["3", "5", "7"]);
 
 
+/* There were a lot of obvious games that the computer was losing so I'm hardcoding them */
+obviousMoves = ['139587','195738','85942136'];
+
+
+games = obviousMoves.slice();
 
 /** test 3 values to see if they are equal */
 function compare3(a, b, c) {
@@ -40,12 +47,14 @@ function boardWonBySomeone(g) {
     }
     return false;
 }
+
+
 /** 
     slow bad linear lookup 
     todo use indexOf
 
     who played square?, returns X or O, or false if nobody
-    */
+*/
 function getPlayerPosition(g, p) {
     for (var i = 0; i < g.length; i++) {
         if (g[i] == p) {
@@ -145,7 +154,7 @@ function generateGame() {
     g = "";
     while (boardWonBySomeone(g) === false) {
         old_board = g;
-        g = playSmartMove(g);
+        g = playValidMove(g);
         if (g == old_board) {
             //there were no more valid moves left
             //it was a tie
@@ -162,6 +171,7 @@ function generateGame() {
 function generateGames(total) {
     var total = total || 1000;
     for (var i = 0; i < total; i++) {
+        clear();
         generateGame();
     }
 }
@@ -171,6 +181,7 @@ function clear() {
     g = "";
     $("." + player1Icon).removeClass(player1Icon);
     $("." + player2Icon).removeClass(player2Icon);
+    $('.btn-danger').removeClass('btn-danger');
     changeSign('');
     return true;
 }
@@ -190,16 +201,20 @@ function play(position, auto) {
     }
     currentPlayer = g.length % 2 == 0 ? player1Icon : player2Icon;
     $("[data-position='"+position+"']").find('span').addClass(currentPlayer);
+    if(currentPlayer === player1Icon ){ $("[data-position='"+position+"']").addClass('btn-danger'); }
+    
     g += "" + position;
     result = boardWonBySomeone(g);
     if ( result !== false ){
-        games[games.length] = g;
+        games.push(g);
+        if(result === "+"){
+            console.log(g);
+        }
         changeSign(result + " won the game");
         gameOver = true;
         return true;
     }
-    if(currentPlayer===player1Icon && auto !== false){
-        //playValidMove(g);
+    if(currentPlayer===player1Icon && auto !== false && computerPlayer === true ){
         // Function that analyses the previous game and makes a smart choice
         playSmartMove(g);
     }
@@ -210,11 +225,16 @@ function play(position, auto) {
     }
     return true;
 }
-
+function cleargames(){
+    games = [];
+}
 function train(){
     clear();
     generateGames(1000);
 }
 function init() {
     clear();
+}
+function toggleAuto(){
+	computerPlayer = false;
 }
