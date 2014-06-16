@@ -24,7 +24,7 @@ comparisons.push(["3", "5", "7"]);
 
 
 /* There were a lot of obvious games that the computer was losing so I'm hardcoding them */
-obviousMoves = ['139587','195738','85942136'];
+obviousMoves = ['139587','195738','85942136','7814','78149','781495','74','7418','741895'];
 
 
 games = obviousMoves.slice();
@@ -108,8 +108,11 @@ function playSmartMove(){
     }
     /* if the game was recorded play a choice, if not, play a random one */
     if(victories.length > 0){
-        shortest = games.reduce(function (a, b) { return a.length < b.length ? a : b; });
+        shortest = games.reduce(function (a, b) { 
+            return ( a.length <= b.length && a.length > g.length ) ? a : b; 
+         });
         choice = shortest[ g.length ];
+        console.log(choice);
         play(choice, false);
     }else{
     	playValidMove(g);
@@ -208,7 +211,7 @@ function play(position, auto) {
     if ( result !== false ){
         games.push(g);
         if(result === "+"){
-            console.log(g);
+            // console.log(g);
         }
         changeSign(result + " won the game");
         gameOver = true;
@@ -236,5 +239,6 @@ function init() {
     clear();
 }
 function toggleAuto(){
-	computerPlayer = false;
+    computerPlayer = !computerPlayer;
+    alert(computerPlayer);
 }
