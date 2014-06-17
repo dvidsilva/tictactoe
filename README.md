@@ -3,7 +3,7 @@ tictactoe
 
 Smart tic tac toe players that learns from previous games.
 
-You can play against the machine in the live version here: [dvidsilva.github.io/tictactoe](dvidsilva.github.io/tictactoe).
+You can play against the machine in the live version here: [dvidsilva.github.io/tictactoe](https://dvidsilva.github.io/tictactoe).
 
 The most recent code will reside in the [gh-pages](https://github.com/dvidsilva/tictactoe/tree/gh-pages) branch to keep the most up to date code available for playing. 
 
