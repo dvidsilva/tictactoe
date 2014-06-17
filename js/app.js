@@ -33,7 +33,7 @@ obviousMoves =
 
 /* strategies, default second move, 
 like if the first move is in the center then play a edge, or if is a corner then the second should be the center. */
-strategies = ['25','45','65','75','51','15','35','85','95','5137','5173'];
+strategies = ['25','45','65','75','51','15','35','85','95','5137','5173','75369'];
 
 /* Start the Board with the computer knowing the obvious games. */
 games = strategies.concat(obviousMoves);
@@ -176,7 +176,11 @@ function generateGame() {
     g = "";
     while (boardWonBySomeone(g) === false) {
         old_board = g;
-        g = playValidMove(g);
+        if ((g % 2 ) === 0 ){
+            g = playValidMove(g);
+        }else{
+        	g = playSmartMove();
+        }
         if (g == old_board) {
             //there were no more valid moves left
             //it was a tie
@@ -260,7 +264,7 @@ function cleargames(){
 /*Generates a bunch of games to fill up the array that trains the game */
 function train(){
     clear();
-    generateGames(10000);
+    generateGames(1000);
 }
 
 /* Clears the board to start a new game*/
