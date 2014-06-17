@@ -5,11 +5,12 @@
 var g = "",  
     gameOver = false,
     obviousMoves = [],
+    strategies = [],
     games = [],
     comparisons = [],
     computerPlayer = true,
-    player1Icon = "glyphicon-remove-sign",
-    player2Icon = "glyphicon-plus-sign";
+    player1Icon = "glyphicon-plus-sign",
+    player2Icon = "glyphicon-remove-sign";
 
 comparisons.push(["1", "2", "3"]);
 comparisons.push(["4", "5", "6"]);
@@ -24,10 +25,17 @@ comparisons.push(["3", "5", "7"]);
 
 
 /* There were a lot of obvious games that the computer was losing so I'm hardcoding them */
-obviousMoves = ['139587','195738','85942136','7814','78149','781495','74','7418','741895'];
+obviousMoves = 
+    ['7534','753496','7598','751436','7598','7534','1795','1759','179532','17953286','179532864','197435','139587','195738','85942136','7814','78149','781495','75','7514','751468','75146823','7418','741895',
+     '453892','459832','1594','159436','1574','157436','1547','154732','1532'
+    ];
 
+/* strategies, default second move, 
+like if the first move is in the center then play a edge, or if is a corner then the second should be the center. */
+strategies = ['25','45','65','75','51','15','35','85','95','5137','5173'];
 
-games = obviousMoves.slice();
+/* Start the Board with the computer knowing the obvious games. */
+games = strategies.concat(obviousMoves);
 
 /** test 3 values to see if they are equal */
 function compare3(a, b, c) {
@@ -37,6 +45,7 @@ function compare3(a, b, c) {
     }
     return false;
 }
+
 /** validate lines verticaly, horizontaly and diagonaly */
 function boardWonBySomeone(g) {
     for (var i = 0; i < comparisons.length; i++) {
@@ -51,7 +60,7 @@ function boardWonBySomeone(g) {
 
 /** 
     slow bad linear lookup 
-    todo use indexOf
+    @todo use indexOf
 
     who played square?, returns X or O, or false if nobody
 */
@@ -59,15 +68,16 @@ function getPlayerPosition(g, p) {
     for (var i = 0; i < g.length; i++) {
         if (g[i] == p) {
             if (i % 2 === 0) {
-                return "x";
-            } else {
                 return "+";
+            } else {
+                return "x";
             }
         }
     }
     return false;
 }
-/* just play a random valid move */
+
+/* just play a random valid move by checking all the board and choosing any empty tile*/
 function playValidMove(g) {
     var valid_moves = {
         "1": '1',
@@ -96,6 +106,12 @@ function playValidMove(g) {
     return g;
 }
 
+
+/* 
+	A smart move from the computer works by checking the array of stored games, it will check for games in which the 
+	board was in the current state and that resulted in the computer winning, 
+	will then play the next move that the computer played in that game to move towards a desired result. 
+*/
 function playSmartMove(){
     var choice, filter, victories = [], shortest;
     filter = new RegExp("^" + g);
@@ -108,11 +124,11 @@ function playSmartMove(){
     }
     /* if the game was recorded play a choice, if not, play a random one */
     if(victories.length > 0){
-        shortest = games.reduce(function (a, b) { 
+        /* Get the shortest of the games that were won, not of all the games FIXED */
+        shortest = victories.reduce(function (a, b) { 
             return ( a.length <= b.length && a.length > g.length ) ? a : b; 
          });
         choice = shortest[ g.length ];
-        console.log(choice);
         play(choice, false);
     }else{
     	playValidMove(g);
@@ -129,6 +145,7 @@ function count_items(x) {
     }
     return c;
 }
+
 /* any of dict */
 function any(x) {
     var count = count_items(x);
@@ -149,6 +166,7 @@ function any(x) {
     console.log("something went wrong, ups");
     return "";
 }
+
 /* 
  * just play randomly against itself
  * and add the game log to the list of all games
@@ -168,6 +186,7 @@ function generateGame() {
     }
     games[games.length] = g;
 }
+
 /*
  * train the computer
  * */
@@ -179,6 +198,8 @@ function generateGames(total) {
     }
 }
 
+
+/*Resets all variables to start over, cleans the board */
 function clear() {
     gameOver = false;
     g = "";
@@ -189,10 +210,11 @@ function clear() {
     return true;
 }
 
-function changeSign(whatyousay){
-	$('#sign').html(whatyousay);
-}
 
+/* 	Puts the color icon in the appropiate sector of the board. 
+	After the move calls the function to check if the game was won and then
+    updates the message acordingly.
+*/
 function play(position, auto) {
     var currentPlayer;
     if( (g.match(position) !== null || g.length === 9 ) ){
@@ -228,17 +250,32 @@ function play(position, auto) {
     }
     return true;
 }
+
+/* Deletes the array that contains previous games from which the computer learns, just for debugging purposes.*/
 function cleargames(){
     games = [];
 }
+
+/*Generates a bunch of games to fill up the array that trains the game */
 function train(){
     clear();
-    generateGames(1000);
+    generateGames(10000);
 }
+
+/* Clears the board to start a new game*/
 function init() {
     clear();
 }
+
+/* Used to play against another person */
 function toggleAuto(){
     computerPlayer = !computerPlayer;
-    alert(computerPlayer);
+    // alert(computerPlayer);
+}
+
+/*
+	Utility function to update the sign in the board
+*/
+function changeSign(whatyousay){
+	$('#sign').html(whatyousay);
 }
