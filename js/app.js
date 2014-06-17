@@ -25,6 +25,7 @@ comparisons.push(["3", "5", "7"]);
 
 
 /* There were a lot of obvious games that the computer was losing so I'm hardcoding them */
+/* It could use a lot more hardcoded games, but you get the idea right? */
 obviousMoves = 
     ['7534','753496','7598','751436','7598','7534','1795','1759','179532','17953286','179532864','197435','139587','195738','85942136','7814','78149','781495','75','7514','751468','75146823','7418','741895',
      '453892','459832','1594','159436','1574','157436','1547','154732','1532'
